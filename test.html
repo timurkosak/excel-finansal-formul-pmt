@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="tr-tr">
+  <head>
+    <meta charset="utf-8">
+    <title>Excel pmt</title>
+    <meta http-equiv="Content-Type" 	content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" 	content="IE=edge">
+    <meta name="viewport" 				content="width=device-width, initial-scale=1">
+	<meta name="author" 				content="Timur KOŞAK" />
+	<link rel="stylesheet" 				href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	<script type="text/javascript" 		src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel='stylesheet' 				href='https://fonts.googleapis.com/css?family=Open+Sans:400,300' type='text/css'>
+	<style>
+	body {font-family:'Open Sans';font-size:16px;font-weight: 300;}
+	</style>
+  </head>
+
+  <body style="background:#F7F7F7;">
+    
+		<div style="max-width:800px;margin:50px auto;">
+			<div class="row">
+				<div class="col-md-6 form-group">
+					
+					<form action="" method="">
+					<div class="header">
+						<h4 class="title">Taksit Ödeme Tablosu</h4>
+					</div>
+					<div class="content">
+						<div class="row">
+							<div class="col-md-12 form-group">
+								<label>Kredi Tutarı</label>
+								<input type="text" class="form-control" name="kredi_tutari" id="kredi_tutari" value="60000,00" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode <= 44" onkeyup="kredi_taksit()" >
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12 form-group">
+								<label>Faiz Oranı</label>
+								<input type="text" class="form-control" name="faiz_orani" id="faiz_orani" value="0,93" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode <= 44" onkeyup="kredi_taksit()" >
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12 form-group">
+								<label>Vergi Oranı</label>
+								<input type="text" class="form-control" name="vergi_orani" id="vergi_orani" value="18,00" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode <= 44" onkeyup="kredi_taksit()" >
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12 form-group">
+								<label>Taksit Sayısı (Ay)</label>
+								<input type="text" class="form-control" name="taksit_sayisi" id="taksit_sayisi" value="24" onkeypress="return event.charCode >= 48 && event.charCode <= 57" onkeyup="kredi_taksit()" >
+							</div>
+						</div>
+					</div>
+					</form>
+					
+				</div>
+				<div class="col-md-6 form-group">
+				
+					<div class="header">
+						<h4 class="title">Taksit Tutarları</h4>
+					</div>
+					
+					<div class="content">
+						<div class="row tb-satir">
+							<div class="col-md-12 col-xs-6 text-right"><div id="taksit_tutari" style="font-size:28px;">0,00 TL</div></div>
+						</div>
+					</div>
+						
+				</div>
+			</div>
+		</div>
+		
+	<script>
+	Number.prototype.number_format = function(c, d, t){
+	var n = this, 
+		c = isNaN(c = Math.abs(c)) ? 2 : c, 
+		d = d == undefined ? "." : d, 
+		t = t == undefined ? "," : t, 
+		s = n < 0 ? "-" : "", 
+		i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))), 
+		j = (j = i.length) > 3 ? j % 3 : 0;
+	   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+	};
+	
+	function pmt(faiz, vergi_orani, taksit_sayisi, kredi_tutari) {
+		var faiz_orani 		= faiz / 100 * (1 + vergi_orani / 100);
+		return 				faiz_orani * -kredi_tutari * Math.pow((1 + faiz_orani), taksit_sayisi) / (1 - Math.pow((1 + faiz_orani), taksit_sayisi));
+	}
+	
+	function kredi_taksit(){
+		var kredi_tutari 		= $("#kredi_tutari").val().replace(',','.');
+		var faiz_orani 			= $("#faiz_orani").val().replace(',','.');
+		var vergi_orani 		= $("#vergi_orani").val().replace(',','.');
+		var taksit_sayisi 		= $("#taksit_sayisi").val();
+		
+		if(kredi_tutari != "" && faiz_orani != "" && vergi_orani != "" && taksit_sayisi != ""){
+			kredi_tutari 		= parseFloat(kredi_tutari);
+			faiz_orani 			= parseFloat(faiz_orani);
+			vergi_orani 		= parseFloat(vergi_orani);
+			var taksit_tutari 	= pmt(faiz_orani, vergi_orani, taksit_sayisi, kredi_tutari);
+			$("#taksit_tutari").html(taksit_tutari.number_format(2,',','.') + ' TL');
+		}else{
+			$("#taksit_tutari").html('0,00 TL');
+		}
+		
+	}
+	
+	$( document ).ready(function() {
+		kredi_taksit();
+	});
+	
+	</script>
+	
+  </body>
+</html>
